@@ -29,7 +29,7 @@ export const useTodoStore = create<TodoStore>((set) => ({
     todo: null,
     loading: false,
     error: null,
-    total: 0,  // Initial total, skip, and limit values
+    total: 0,
     skip: 0,
     limit: 30,
 
@@ -37,7 +37,7 @@ export const useTodoStore = create<TodoStore>((set) => ({
         set({ loading: true, error: null });
         try {
             const response = await axiosInstance.get('/todos');
-            const { todos, total, skip, limit } = response.data;  // Destructuring the response
+            const { todos, total, skip, limit } = response.data;
 
             set({ todos, total, skip, limit, loading: false });
         } catch (error: any) {

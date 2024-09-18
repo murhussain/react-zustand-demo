@@ -1,12 +1,11 @@
-// src/store/todoStore.ts
 import { create } from 'zustand';
-import axios from '../api/axios';
+import axiosInstance  from "../api/axios.ts";
 
 export interface Todo {
     id: number;
-    title: string;
-    description: string;
+    todo: string;
     completed: boolean;
+    userId: number;
 }
 
 interface TodoStore {
@@ -14,6 +13,9 @@ interface TodoStore {
     todo: Todo | null;
     loading: boolean;
     error: string | null;
+    total: number;
+    skip: number;
+    limit: number;
 
     fetchTodos: () => Promise<void>;
     fetchTodoById: (id: number) => Promise<void>;
@@ -27,12 +29,17 @@ export const useTodoStore = create<TodoStore>((set) => ({
     todo: null,
     loading: false,
     error: null,
+    total: 0,  // Initial total, skip, and limit values
+    skip: 0,
+    limit: 30,
 
     fetchTodos: async () => {
         set({ loading: true, error: null });
         try {
-            const response = await axios.get('/todos');
-            set({ todos: response.data, loading: false });
+            const response = await axiosInstance.get('/todos');
+            const { todos, total, skip, limit } = response.data;  // Destructuring the response
+
+            set({ todos, total, skip, limit, loading: false });
         } catch (error: any) {
             set({ error: error.message, loading: false });
         }
@@ -41,7 +48,7 @@ export const useTodoStore = create<TodoStore>((set) => ({
     fetchTodoById: async (id: number) => {
         set({ loading: true, error: null });
         try {
-            const response = await axios.get(`/todos/${id}`);
+            const response = await axiosInstance.get(`/todos/${id}`);
             set({ todo: response.data, loading: false });
         } catch (error: any) {
             set({ error: error.message, loading: false });
@@ -51,7 +58,7 @@ export const useTodoStore = create<TodoStore>((set) => ({
     addTodo: async (newTodo: Omit<Todo, 'id'>) => {
         set({ loading: true, error: null });
         try {
-            const response = await axios.post('/todos', newTodo);
+            const response = await axiosInstance.post('/todos', newTodo);
             set((state) => ({
                 todos: [...state.todos, response.data],
                 loading: false,
@@ -64,7 +71,7 @@ export const useTodoStore = create<TodoStore>((set) => ({
     updateTodo: async (id: number, updatedTodo: Partial<Todo>) => {
         set({ loading: true, error: null });
         try {
-            const response = await axios.put(`/todos/${id}`, updatedTodo);
+            const response = await axiosInstance.put(`/todos/${id}`, updatedTodo);
             set((state) => ({
                 todos: state.todos.map((todo) => (todo.id === id ? response.data : todo)),
                 loading: false,
@@ -77,7 +84,7 @@ export const useTodoStore = create<TodoStore>((set) => ({
     deleteTodo: async (id: number) => {
         set({ loading: true, error: null });
         try {
-            await axios.delete(`/todos/${id}`);
+            await axiosInstance.delete(`/todos/${id}`);
             set((state) => ({
                 todos: state.todos.filter((todo) => todo.id !== id),
                 loading: false,

@@ -5,7 +5,7 @@ const TodoList: React.FC = () => {
     const { todos, fetchTodos, loading, error } = useTodoStore();
 
     useEffect(() => {
-        fetchTodos();
+        fetchTodos().then(() => {});
     }, [fetchTodos]);
 
     if (loading) return <p>Loading...</p>;
@@ -17,8 +17,8 @@ const TodoList: React.FC = () => {
             <ul>
                 {todos.map((todo) => (
                     <li key={todo.id} className="mb-2 p-4 bg-gray-100 rounded shadow">
-                        <h2 className="text-lg font-semibold">{todo.title}</h2>
-                        <p>{todo.description}</p>
+                        <h2 className="text-lg font-semibold">{todo.todo}</h2>
+                        <p>{todo.todo}</p>
                         <p>Completed: {todo.completed ? 'Yes' : 'No'}</p>
                     </li>
                 ))}

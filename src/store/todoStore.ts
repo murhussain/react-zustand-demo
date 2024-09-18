@@ -58,7 +58,7 @@ export const useTodoStore = create<TodoStore>((set) => ({
     addTodo: async (newTodo: Omit<Todo, 'id'>) => {
         set({ loading: true, error: null });
         try {
-            const response = await axiosInstance.post('/todos', newTodo);
+            const response = await axiosInstance.post('/todos/add', newTodo);
             set((state) => ({
                 todos: [...state.todos, response.data],
                 loading: false,
